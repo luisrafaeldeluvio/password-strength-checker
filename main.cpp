@@ -16,6 +16,22 @@
 //     int length {};
 //     std::string password {};
 // };
+// - [x] at least one loop
+// - [x] at least one conditional
+// - [x] at least one switch
+// - [x] Include two or more user-defined functions
+// - [ ] Store and manipulate data using arrays and array pointers
+// - [x] Use strings for input and output operations
+// - [x] Incorporate the cctype library to validate or manipulate characters
+
+struct Password {
+    bool hasSymbol = false;
+    bool hasUpper = false;
+    bool hasNum = false;
+    int power = 0;
+    int length {};
+    std::string password {};
+};
 
 // maybe create a git
 

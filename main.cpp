@@ -1,12 +1,14 @@
 #include <iostream>
 #include <cctype>
-#include <limits>
 #include <string>
 #include <vector>
 
 void showStartMenu();
 void showCheckPasswordMenu();
 
+// - maybe bookmarking password (having names)
+//     - When testing passwords, it will check if it
+//         already exist on the bookmark
 struct Password {
     int id {};
     bool hasSymbol = false;
@@ -16,6 +18,11 @@ struct Password {
     int length {};
     std::string password {};
 };
+
+void showAddBookmarkMenu(int startLimit, int endLimit);
+
+std::vector<Password> history = {};
+std::vector<Password*> bookmarks = {};
 
 Password checkPass(std::string inputPassword) {
     Password pass {};
@@ -65,11 +72,8 @@ std::string parsePassPower(int power) {
     }
 }
 
-void showPassword(Password pass) {
-    std::cout << pass.password << " - " << parsePassPower(pass.power);
-}
 
-std::vector<Password> history = {
+std::vector<Password> mockHistory = {
     {1,  true,  true,  true,  7, 12, "P@ssw0rd!123"},
     {2,  true,  true,  false, 5, 10, "Secure99#"},
     {3,  true,  false, true,  4,  8, "d0llar$"},
@@ -80,17 +84,81 @@ std::vector<Password> history = {
     {8,  false, false, true,  3,  6, "123456"},
     {9,  true,  true,  true,  7, 15, "Str0ng!P#ss"},
     {10, true,  false, true,  4, 10, "an0ther$"},
-    {11, false, true,  true,  5,  8, "Mix42B"},
-    {12, true,  true,  false, 6, 13, "AlphaBeta#9"},
-    {13, false, false, false, 0,  5, "weak"},
-    {14, true,  false, true,  4,  9, "test!2"},
-    {15, false, true,  false, 2,  7, "UPPERNO"},
-    {16, true,  true,  true,  7, 12, "F!ght0n#"},
-    {17, false, true,  true,  5, 10, "Win2024"},
-    {18, true,  false, false, 1,  6, "!@#$%^"},
-    {19, false, false, true,  3,  8, "88888888"},
-    {20, true,  true,  true,  7, 14, "C0mpl3x!ty"}
 };
+
+void showPassword(Password pass) {
+    std::cout << pass.password << " - " << parsePassPower(pass.power);
+}
+
+void showHistoryMenu() {
+
+    bool isShown = true;
+    int limit = 5;
+    int currentshown = 0;
+        std::cout << "[N]ext [P]revious [B]ookmark [E]xit\n";
+        int shown = currentshown;
+        for (int i = currentshown; i < mockHistory.size(); i++) {
+            if (shown > limit - 1) break;
+            std::cout << "[" << i + 1 << "]";
+            for (Password *j : bookmarks) {
+                if (j->id == mockHistory[i].id) {
+                    std::cout << "*";
+                    break;
+                }
+            }
+            std::cout << " " << mockHistory[i].password << "\n";
+            shown++;
+        }
+
+        std::cout << "--> ";
+        char input {};
+        switch (input) {
+            case 'N':
+            case 'n':
+                limit += 5;
+                currentshown = shown;
+                break;
+            case 'P':
+            case 'p':
+                limit -= 5;
+                currentshown -= 5;
+            case 'B':
+                showAddBookmarkMenu(currentshown, limit);
+                break;
+            case 'E':
+                isShown = false;
+                break;
+            default:
+
+                break;
+        }
+    } while (isShown);
+
+}
+
+void showAddBookmarkMenu(int startLimit, int endLimit) {
+    bool isShown = true;
+    do {
+        std::cout << "Select the password to bookmark (1~10): ";
+        std::cout << "Enter 0 to cancel";
+        int choice;
+        std::cin >> choice;
+
+        if (choice == 0) isShown = false;
+        if (choice > endLimit || choice < startLimit) {
+         std::cout << "try again" << startLimit << "   " << endLimit;
+            continue;
+        }
+
+        bookmarks.push_back(&mockHistory[choice-1]);
+        std::cout << "\nBookmarks\n";
+        for (Password *b : bookmarks) {
+            std::cout << b->password << "\n";
+        }
+    } while (isShown);
+
+
+}
 
 void showStartMenu() {
     bool isShown = true;
@@ -171,6 +239,8 @@ void showCheckPasswordMenu() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (isShown);
 }
+
+
 int main() {
     showStartMenu();
 

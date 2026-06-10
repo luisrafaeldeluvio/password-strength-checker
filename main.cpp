@@ -1,23 +1,13 @@
 #include <iostream>
 #include <cctype>
 #include <string>
+#include <vector>
 
-// features idea:
-// - password history
-// - score breakdown
-// - maybe bookmarking password (having names)
-//     - When testing passwords, it will check if it
-//         already exist on the bookmark
-
-// - [x] at least one loop
-// - [x] at least one conditional
-// - [x] at least one switch
-// - [x] Include two or more user-defined functions
-// - [ ] Store and manipulate data using arrays and array pointers
-// - [x] Use strings for input and output operations
-// - [x] Incorporate the cctype library to validate or manipulate characters
+void showStartMenu();
+void showCheckPasswordMenu();
 
 struct Password {
+    int id {};
     bool hasSymbol = false;
     bool hasUpper = false;
     bool hasNum = false;
@@ -74,20 +64,91 @@ std::string parsePassPower(int power) {
     }
 }
 
-int main() {
+void showPassword(Password pass) {
+    std::cout << pass.password << " - " << parsePassPower(pass.power);
+}
+
+std::vector<Password> history = {
+    {1,  true,  true,  true,  7, 12, "P@ssw0rd!123"},
+    {2,  true,  true,  false, 5, 10, "Secure99#"},
+    {3,  true,  false, true,  4,  8, "d0llar$"},
+    {4,  false, true,  true,  6, 11, "HelloWorld42"},
+    {5,  true,  true,  true,  7, 14, "C++Rocks!2#"},
+    {6,  false, true,  false, 2,  9, "OnlyUpper"},
+    {7,  true,  false, false, 1,  7, "$ymbols"},
+    {8,  false, false, true,  3,  6, "123456"},
+    {9,  true,  true,  true,  7, 15, "Str0ng!P#ss"},
+    {10, true,  false, true,  4, 10, "an0ther$"},
+    {11, false, true,  true,  5,  8, "Mix42B"},
+    {12, true,  true,  false, 6, 13, "AlphaBeta#9"},
+    {13, false, false, false, 0,  5, "weak"},
+    {14, true,  false, true,  4,  9, "test!2"},
+    {15, false, true,  false, 2,  7, "UPPERNO"},
+    {16, true,  true,  true,  7, 12, "F!ght0n#"},
+    {17, false, true,  true,  5, 10, "Win2024"},
+    {18, true,  false, false, 1,  6, "!@#$%^"},
+    {19, false, false, true,  3,  8, "88888888"},
+    {20, true,  true,  true,  7, 14, "C0mpl3x!ty"}
+};
+
+void showStartMenu() {
+    bool isShown = true;
+    do {
+        std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
+        std::string title[7] = {
+            "  __                                           __                                           __                               ",
+            " /  |                                  |      /    /                        /    /         /    /              /             ",
+            "(___| ___  ___  ___       ___  ___  ___|     (___ (___  ___  ___  ___  ___ (___ (___      (    (___  ___  ___ (     ___  ___ ",
+            "|    |   )|___ |___ |   )|   )|   )|   )         )|    |   )|___)|   )|   )|    |   )     |   )|   )|___)|    |___)|___)|   )",
+            "|    |__/| __/  __/ |/\\/ |__/ |    |__/       __/ |__  |    |__  |  / |__/ |__  |  /      |__/ |  / |__  |__  | \\  |__  |    ",
+            "                                                                      __/                                                    "
+        };
+        for (std::string line : title) {
+            std::cout << line << "\n";
+        }
+        std::cout << "[1]. Check Password\n";
+        std::cout << "[2]. History\n";
+        std::cout << "[3]. Bookmarks\n";
+        std::cout << "[0]. Exit\n";
+
+        int input {};
+        std::cout << "\n\n--=> ";
+        std::cin >> input;
+
+        switch (input) {
+            case 1:
+                isShown = false;
+                showCheckPasswordMenu();
+                break;
+            case 0:
+                isShown = false;
+                break;
+            default:
+                break;
+        }
+    } while (isShown);
+}
+
+void showCheckPasswordMenu() {
+    bool isShown = true;
     do {
         std::string input;
         std::cout << "password: ";
         std::cin >> input;
 
+        if (input == "/exit") {
+            isShown = false;
+            showStartMenu();
+        }
+
         Password pass = checkPass(input);
 
-        // great password is >7 points;
-        // good password is 4-6  points;
-        // okay password is 2-3 points
-        // bad password is 1 points
         std::cout << "score: " << pass.power << "\n";
         std::cout << parsePassPower(pass.power);
         std::cout << "\n\n";
-    } while (true);
+    } while (isShown);
+}
+int main() {
+    showStartMenu();
+
 }

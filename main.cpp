@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cctype>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -95,7 +96,7 @@ void showStartMenu() {
     bool isShown = true;
     do {
         std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
-        std::string title[7] = {
+        std::string titleAscii[7] = {
             "  __                                           __                                           __                               ",
             " /  |                                  |      /    /                        /    /         /    /              /             ",
             "(___| ___  ___  ___       ___  ___  ___|     (___ (___  ___  ___  ___  ___ (___ (___      (    (___  ___  ___ (     ___  ___ ",
@@ -103,7 +104,7 @@ void showStartMenu() {
             "|    |__/| __/  __/ |/\\/ |__/ |    |__/       __/ |__  |    |__  |  / |__/ |__  |  /      |__/ |  / |__  |__  | \\  |__  |    ",
             "                                                                      __/                                                    "
         };
-        for (std::string line : title) {
+        for (std::string line : titleAscii) {
             std::cout << line << "\n";
         }
         std::cout << "[1]. Check Password\n";
@@ -112,7 +113,7 @@ void showStartMenu() {
         std::cout << "[0]. Exit\n";
 
         int input {};
-        std::cout << "\n\n--=> ";
+        std::cout << "\n\n───🡆 ";
         std::cin >> input;
 
         switch (input) {
@@ -132,8 +133,27 @@ void showStartMenu() {
 void showCheckPasswordMenu() {
     bool isShown = true;
     do {
+        std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
+
+        std::string passwordAscii[8] = {
+            "$$$$$$$\\                                                                       $$\\ ",
+            "$$  __$$\\                                                                      $$ |",
+            "$$ |  $$ |$$$$$$\\   $$$$$$$\\  $$$$$$$\\ $$\\  $$\\  $$\\  $$$$$$\\   $$$$$$\\   $$$$$$$ |",
+            "$$$$$$$  |\\____$$\\ $$  _____|$$  _____|$$ | $$ | $$ |$$  __$$\\ $$  __$$\\ $$  __$$ |",
+            "$$  ____/ $$$$$$$ |\\$$$$$$\\  \\$$$$$$\\  $$ | $$ | $$ |$$ /  $$ |$$ |  \\__|$$ /  $$ |",
+            "$$ |     $$  __$$ | \\____$$\\  \\____$$\\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$ |  $$ |",
+            "$$ |     \\$$$$$$$ |$$$$$$$  |$$$$$$$  |\\$$$$$\\$$$$  |\\$$$$$$  |$$ |      \\$$$$$$$ |",
+            "\\__|      \\_______|\\_______/ \\_______/  \\_____\\____/  \\______/ \\__|       \\_______|",
+        };
+
+        for (std::string line : passwordAscii) {
+            std::cout << line << "\n";
+        }
+        std::cout << "\n/exit to return to main menu";
+        std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
         std::string input;
-        std::cout << "password: ";
+        std::cout << "Password:: ";
+
         std::cin >> input;
 
         if (input == "/exit") {
@@ -146,6 +166,9 @@ void showCheckPasswordMenu() {
         std::cout << "score: " << pass.power << "\n";
         std::cout << parsePassPower(pass.power);
         std::cout << "\n\n";
+        // insert breakdown of password
+        std::cin.get();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (isShown);
 }
 int main() {

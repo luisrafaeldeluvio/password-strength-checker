@@ -1,10 +1,13 @@
 #include <iostream>
 #include <cctype>
 #include <string>
+#include <limits>
 #include <vector>
 
 void showStartMenu();
 void showCheckPasswordMenu();
+void showAddBookmarkMenu(int startLimit, int endLimit);
+
 
 // - maybe bookmarking password (having names)
 //     - When testing passwords, it will check if it
@@ -19,9 +22,20 @@ struct Password {
     std::string password {};
 };
 
-void showAddBookmarkMenu(int startLimit, int endLimit);
 
 std::vector<Password> history = {};
+std::vector<Password> mockHistory = {
+    {1,  true,  true,  true,  7, 12, "P@ssw0rd!123"},
+    {2,  true,  true,  false, 5, 10, "Secure99#"},
+    {3,  true,  false, true,  4,  8, "d0llar$"},
+    {4,  false, true,  true,  6, 11, "HelloWorld42"},
+    {5,  true,  true,  true,  7, 14, "C++Rocks!2#"},
+    {6,  false, true,  false, 2,  9, "OnlyUpper"},
+    {7,  true,  false, false, 1,  7, "$ymbols"},
+    {8,  false, false, true,  3,  6, "123456"},
+    {9,  true,  true,  true,  7, 15, "Str0ng!P#ss"},
+    {10, true,  false, true,  4, 10, "an0ther$"},
+};
 std::vector<Password*> bookmarks = {};
 
 Password checkPass(std::string inputPassword) {
@@ -72,29 +86,15 @@ std::string parsePassPower(int power) {
     }
 }
 
-
-std::vector<Password> mockHistory = {
-    {1,  true,  true,  true,  7, 12, "P@ssw0rd!123"},
-    {2,  true,  true,  false, 5, 10, "Secure99#"},
-    {3,  true,  false, true,  4,  8, "d0llar$"},
-    {4,  false, true,  true,  6, 11, "HelloWorld42"},
-    {5,  true,  true,  true,  7, 14, "C++Rocks!2#"},
-    {6,  false, true,  false, 2,  9, "OnlyUpper"},
-    {7,  true,  false, false, 1,  7, "$ymbols"},
-    {8,  false, false, true,  3,  6, "123456"},
-    {9,  true,  true,  true,  7, 15, "Str0ng!P#ss"},
-    {10, true,  false, true,  4, 10, "an0ther$"},
-};
-
 void showPassword(Password pass) {
     std::cout << pass.password << " - " << parsePassPower(pass.power);
 }
 
 void showHistoryMenu() {
-
     bool isShown = true;
     int limit = 5;
     int currentshown = 0;
+    do {
         std::cout << "[N]ext [P]revious [B]ookmark [E]xit\n";
         int shown = currentshown;
         for (int i = currentshown; i < mockHistory.size(); i++) {
@@ -112,6 +112,7 @@ void showHistoryMenu() {
 
         std::cout << "--> ";
         char input {};
+        std::cin >> input;
         switch (input) {
             case 'N':
             case 'n':
@@ -122,6 +123,7 @@ void showHistoryMenu() {
             case 'p':
                 limit -= 5;
                 currentshown -= 5;
+                break;
             case 'B':
                 showAddBookmarkMenu(currentshown, limit);
                 break;
@@ -133,9 +135,7 @@ void showHistoryMenu() {
                 break;
         }
     } while (isShown);
-
 }
-
 void showAddBookmarkMenu(int startLimit, int endLimit) {
     bool isShown = true;
     do {
@@ -189,6 +189,10 @@ void showStartMenu() {
                 isShown = false;
                 showCheckPasswordMenu();
                 break;
+            case 2:
+                isShown = false;
+                showHistoryMenu();
+                break;
             case 0:
                 isShown = false;
                 break;
@@ -239,7 +243,6 @@ void showCheckPasswordMenu() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (isShown);
 }
-
 
 int main() {
     showStartMenu();

@@ -3,21 +3,9 @@
 #include <string>
 #include <vector>
 
-// features idea:
-// - password history
-// - score breakdown
 // - maybe bookmarking password (having names)
 //     - When testing passwords, it will check if it
 //         already exist on the bookmark
-
-// - [x] at least one loop
-// - [x] at least one conditional
-// - [x] at least one switch
-// - [x] Include two or more user-defined functions
-// - [ ] Store and manipulate data using arrays and array pointers
-// - [x] Use strings for input and output operations
-// - [x] Incorporate the cctype library to validate or manipulate characters
-
 struct Password {
     int id {};
     bool hasSymbol = false;
@@ -27,6 +15,11 @@ struct Password {
     int length {};
     std::string password {};
 };
+
+void showAddBookmarkMenu(int startLimit, int endLimit);
+
+std::vector<Password> history = {};
+std::vector<Password*> bookmarks = {};
 
 Password checkPass(std::string inputPassword) {
     Password pass {};
@@ -76,8 +69,6 @@ std::string parsePassPower(int power) {
     }
 }
 
-// how do you even return an array?
-
 std::vector<Password> mockHistory = {
     {1,  true,  true,  true,  7, 12, "P@ssw0rd!123"},
     {2,  true,  true,  false, 5, 10, "Secure99#"},
@@ -90,6 +81,78 @@ std::vector<Password> mockHistory = {
     {9,  true,  true,  true,  7, 15, "Str0ng!P#ss"},
     {10, true,  false, true,  4, 10, "an0ther$"},
 };
+
+void showHistoryMenu() {
+
+    bool isShown = true;
+    int limit = 5;
+    int currentshown = 0;
+    do {
+        std::cout << "[N]ext [P]revious [B]ookmark [E]xit\n";
+        int shown = currentshown;
+        for (int i = currentshown; i < mockHistory.size(); i++) {
+            if (shown > limit - 1) break;
+            std::cout << "[" << i + 1 << "]";
+            for (Password *j : bookmarks) {
+                if (j->id == mockHistory[i].id) {
+                    std::cout << "*";
+                    break;
+                }
+            }
+            std::cout << " " << mockHistory[i].password << "\n";
+            shown++;
+        }
+
+        std::cout << "--> ";
+        char input {};
+        std::cin >> input;
+        switch (input) {
+            case 'N':
+            case 'n':
+                limit += 5;
+                currentshown = shown;
+                break;
+            case 'P':
+            case 'p':
+                limit -= 5;
+                currentshown -= 5;
+            case 'B':
+                showAddBookmarkMenu(currentshown, limit);
+                break;
+            case 'E':
+                isShown = false;
+                break;
+            default:
+
+                break;
+        }
+    } while (isShown);
+
+}
+
+void showAddBookmarkMenu(int startLimit, int endLimit) {
+    bool isShown = true;
+    do {
+        std::cout << "Select the password to bookmark (1~10): ";
+        std::cout << "Enter 0 to cancel";
+        int choice;
+        std::cin >> choice;
+
+        if (choice == 0) isShown = false;
+        if (choice > endLimit || choice < startLimit) {
+         std::cout << "try again" << startLimit << "   " << endLimit;
+            continue;
+        }
+
+        bookmarks.push_back(&mockHistory[choice-1]);
+        std::cout << "\nBookmarks\n";
+        for (Password *b : bookmarks) {
+            std::cout << b->password << "\n";
+        }
+    } while (isShown);
+
+
+}
 
 int main() {
     // do {
@@ -112,20 +175,13 @@ int main() {
     // lets work on the bookmark picture,
     // the history will just be a vector of Password and the bookmark will just be vector or reference(&) from the history
 
-    std::vector<Password*> bookmarks = {};
 
-    std::cout << "History\n";
-    for (Password p: mockHistory) {
-        std::cout << p.password << "\n";
-    }
+    showHistoryMenu();
+
 
     // add a bookmark
-    bookmarks.push_back(&mockHistory[0]);
-
-    std::cout << "\nBookmarks\n";
-    for (Password *b : bookmarks) {
-        std::cout << b->password << "\n";
-    }
+    // bookmarks.push_back(&mockHistory[0]);
+    //
 
 
 

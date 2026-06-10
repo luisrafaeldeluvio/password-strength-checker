@@ -8,10 +8,6 @@ void showStartMenu();
 void showCheckPasswordMenu();
 void showAddBookmarkMenu(int startLimit, int endLimit);
 
-
-// - maybe bookmarking password (having names)
-//     - When testing passwords, it will check if it
-//         already exist on the bookmark
 struct Password {
     int id {};
     bool hasSymbol = false;
@@ -21,7 +17,6 @@ struct Password {
     int length {};
     std::string password {};
 };
-
 
 std::vector<Password> history = {};
 std::vector<Password> mockHistory = {
@@ -38,6 +33,7 @@ std::vector<Password> mockHistory = {
 };
 std::vector<Password*> bookmarks = {};
 
+// adding the id here is not yet implemented.
 Password checkPass(std::string inputPassword) {
     Password pass {};
     pass.password = inputPassword;
@@ -86,8 +82,8 @@ std::string parsePassPower(int power) {
     }
 }
 
-void showPassword(Password pass) {
-    std::cout << pass.password << " - " << parsePassPower(pass.power);
+void showLineBreak() {
+    std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
 }
 
 void showHistoryMenu() {
@@ -95,7 +91,28 @@ void showHistoryMenu() {
     int limit = 5;
     int currentshown = 0;
     do {
-        std::cout << "[N]ext [P]revious [B]ookmark [E]xit\n";
+        showLineBreak();
+        std::string historyAscii[11] = {
+            "$$\\   $$\\ $$\\                                     ",
+            "$$ |  $$ |\\__|            $$ |                    ",
+            "$$ |  $$ |$$\\  $$$$$$$\\ $$$$$$\\    $$$$$$\\   $$$$$$\\  $$\\   $$\\ ",
+            "$$$$$$$$ |$$ |$$  _____|\\_$$  _|  $$  __$$\\ $$  __$$\\ $$ |  $$ |",
+            "$$  __$$ |$$ |\\$$$$$$\\    $$ |    $$ /  $$ |$$ |  \\__|$$ |  $$ |",
+            "$$ |  $$ |$$ | \\____$$\\   $$ |$$\\ $$ |  $$ |$$ |      $$ |  $$ |",
+            "$$ |  $$ |$$ |$$$$$$$  |  \\$$$$  |\\$$$$$$  |$$ |      \\$$$$$$$ |",
+            "\\__|  \\__|\\__|\\_______/    \\____/  \\______/ \\__|       \\____$$ |",
+            "                                                      $$\\   $$ |",
+            "                                                      \\$$$$$$  |",
+            "                                                       \\______/ "
+        };
+
+        for (std::string line : historyAscii) {
+            std::cout << line << "\n";
+        }
+
+        std::cout << "\n[N]ext [P]revious [B]ookmark [E]xit";
+        showLineBreak();
+
         int shown = currentshown;
         for (int i = currentshown; i < mockHistory.size(); i++) {
             if (shown > limit - 1) break;
@@ -110,7 +127,7 @@ void showHistoryMenu() {
             shown++;
         }
 
-        std::cout << "--> ";
+        std::cout << "\n\n───🡆 ";
         char input {};
         std::cin >> input;
         switch (input) {
@@ -125,13 +142,15 @@ void showHistoryMenu() {
                 currentshown -= 5;
                 break;
             case 'B':
+            case 'b':
                 showAddBookmarkMenu(currentshown, limit);
                 break;
             case 'E':
+            case 'e':
                 isShown = false;
+                showStartMenu();
                 break;
             default:
-
                 break;
         }
     } while (isShown);
@@ -163,7 +182,7 @@ void showAddBookmarkMenu(int startLimit, int endLimit) {
 void showStartMenu() {
     bool isShown = true;
     do {
-        std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
+        showLineBreak();
         std::string titleAscii[7] = {
             "  __                                           __                                           __                               ",
             " /  |                                  |      /    /                        /    /         /    /              /             ",
@@ -175,25 +194,31 @@ void showStartMenu() {
         for (std::string line : titleAscii) {
             std::cout << line << "\n";
         }
-        std::cout << "[1]. Check Password\n";
-        std::cout << "[2]. History\n";
-        std::cout << "[3]. Bookmarks\n";
-        std::cout << "[0]. Exit\n";
+        std::cout << "[C]heck Password\n";
+        std::cout << "[H]istory\n";
+        std::cout << "[B]ookmarks\n";
+        std::cout << "[E]xit\n";
 
-        int input {};
+        char input {};
         std::cout << "\n\n───🡆 ";
         std::cin >> input;
 
         switch (input) {
-            case 1:
+            case 'C':
+            case 'c':
                 isShown = false;
                 showCheckPasswordMenu();
                 break;
-            case 2:
+            case 'H':
+            case 'h':
                 isShown = false;
                 showHistoryMenu();
                 break;
-            case 0:
+            case 'B':
+            case 'b':
+                break;
+            case 'E':
+            case 'e':
                 isShown = false;
                 break;
             default:
@@ -246,5 +271,4 @@ void showCheckPasswordMenu() {
 
 int main() {
     showStartMenu();
-
 }

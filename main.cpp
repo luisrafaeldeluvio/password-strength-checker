@@ -243,6 +243,42 @@ void showStartMenu() {
     } while (isShown);
 }
 
+void showPasswordScoreBreakdown(Password pass) {
+    showLineBreak();
+
+    std::cout << "This is a " << parsePassPower(pass.power) << " password.\n";
+    std::cout << "\n\t\t\t\tSCORE BREAKDOWN\n";
+
+    if (pass.hasSymbol) {
+        std::cout << "\t\t" << pass.symbolCount << " symbol/s \t\t\t\t\t+1\n";
+    } else {
+        std::cout << "\t\tNo symbols \t\t\t\t\t+0\n";
+    }
+
+    if (pass.hasUpper) {
+        std::cout << "\t\t" << pass.upperCount << " uppercase letter/s \t\t+1\n";
+    } else {
+        std::cout << "\t\tNo uppercase letters \t\t+0\n";
+    }
+
+    if (pass.hasNum) {
+        std::cout << "\t\t" << pass.numCount << " number/s \t\t\t\t\t+1\n";
+    } else {
+        std::cout << "\t\tNo numbers, \t\t\t\t+0\n";
+    }
+
+    int length = pass.length;
+    int powerFromLength {};
+    while (length > 4) {
+        powerFromLength++;
+        length -= 4;
+    }
+
+    std::cout << "\t\t" << pass.length << " character/s long \t\t+" << powerFromLength << "\n";
+    std::cout << "-----------------------------------------------\n";
+    std::cout << "\t\t\t\t\t" << pass.power << " points\n";
+}
+
 void showCheckPasswordMenu() {
     bool isShown = true;
     do {
@@ -276,10 +312,7 @@ void showCheckPasswordMenu() {
 
         Password pass = checkPass(input);
 
-        std::cout << "score: " << pass.power << "\n";
-        std::cout << parsePassPower(pass.power);
-        std::cout << "\n\n";
-        // insert breakdown of password
+        showPasswordScoreBreakdown(pass);
         std::cin.get();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (isShown);

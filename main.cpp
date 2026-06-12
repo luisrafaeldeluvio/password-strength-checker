@@ -4,6 +4,9 @@
 #include <limits>
 #include <vector>
 
+// create branch for the score breakdown
+
+// ----- INITIALIZATION CODE -----
 void showStartMenu();
 void showCheckPasswordMenu();
 void showAddBookmarkMenu(int startLimit, int endLimit);
@@ -32,6 +35,8 @@ std::vector<Password> mockHistory = {
     {10, true,  false, true,  4, 10, "an0ther$"},
 };
 std::vector<Password*> bookmarks = {};
+
+// ----- LOGIC CODE -----
 
 // adding the id here is not yet implemented.
 Password checkPass(std::string inputPassword) {
@@ -81,6 +86,8 @@ std::string parsePassPower(int power) {
             return "great";
     }
 }
+
+// ----- DISPLAY CODE ------
 
 void showLineBreak() {
     std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
@@ -155,6 +162,7 @@ void showHistoryMenu() {
         }
     } while (isShown);
 }
+
 void showAddBookmarkMenu(int startLimit, int endLimit) {
     bool isShown = true;
     do {
@@ -175,8 +183,6 @@ void showAddBookmarkMenu(int startLimit, int endLimit) {
             std::cout << b->password << "\n";
         }
     } while (isShown);
-
-
 }
 
 void showStartMenu() {

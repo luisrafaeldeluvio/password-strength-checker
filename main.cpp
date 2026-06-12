@@ -16,6 +16,9 @@ struct Password {
     bool hasSymbol = false;
     bool hasUpper = false;
     bool hasNum = false;
+    int symbolCount = 0;
+    int upperCount = 0;
+    int numCount = 0;
     int power = 0;
     int length {};
     std::string password {};
@@ -23,16 +26,16 @@ struct Password {
 
 std::vector<Password> history = {};
 std::vector<Password> mockHistory = {
-    {1,  true,  true,  true,  7, 12, "P@ssw0rd!123"},
-    {2,  true,  true,  false, 5, 10, "Secure99#"},
-    {3,  true,  false, true,  4,  8, "d0llar$"},
-    {4,  false, true,  true,  6, 11, "HelloWorld42"},
-    {5,  true,  true,  true,  7, 14, "C++Rocks!2#"},
-    {6,  false, true,  false, 2,  9, "OnlyUpper"},
-    {7,  true,  false, false, 1,  7, "$ymbols"},
-    {8,  false, false, true,  3,  6, "123456"},
-    {9,  true,  true,  true,  7, 15, "Str0ng!P#ss"},
-    {10, true,  false, true,  4, 10, "an0ther$"},
+    {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
+    {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
+    {3,  true,  false, true,  1,    0,   1,    2,   7,   "d0llar$"},
+    {4,  false, true,  true,  0,    2,   2,    2,   12,  "HelloWorld42"},
+    {5,  true,  true,  true,  4,    2,   1,    3,   11,  "C++Rocks!2#"},
+    {6,  false, true,  false, 0,    2,   0,    1,   9,   "OnlyUpper"},
+    {7,  true,  false, false, 1,    0,   0,    1,   7,   "$ymbols"},
+    {8,  false, false, true,  0,    0,   6,    1,   6,   "123456"},
+    {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
+    {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
 };
 std::vector<Password*> bookmarks = {};
 
@@ -45,19 +48,26 @@ Password checkPass(std::string inputPassword) {
     pass.length = inputPassword.length();
 
     for (char c : inputPassword) {
-        if (!pass.hasSymbol && std::ispunct(c)) {
-            pass.hasSymbol = true;
-            pass.power++;
-            continue;
+        if (std::ispunct(c)) {
+            pass.symbolCount++;
+            if (!pass.hasSymbol) {
+                pass.hasSymbol = true;
+                pass.power++;
+            }
         }
-        if (!pass.hasUpper && std::isupper(c) ) {
-            pass.hasUpper = true;
-            pass.power++;
-            continue;
+        else if (std::isupper(c)) {
+            pass.upperCount++;
+            if (!pass.hasUpper) {
+                pass.hasUpper = true;
+                pass.power++;
+            }
         }
-        if (!pass.hasNum && std::isdigit(c)) {
-            pass.hasNum = true;
-            pass.power++;
+        else if (std::isdigit(c)) {
+            pass.numCount++;
+            if (!pass.hasNum) {
+                pass.hasNum = true;
+                pass.power++;
+            }
         }
     }
 
@@ -77,7 +87,7 @@ std::string parsePassPower(int power) {
             return "bad";
         case 2:
         case 3:
-           return "okay";
+           return "fair";
         case 4:
         case 5:
         case 6:

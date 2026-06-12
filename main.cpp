@@ -143,14 +143,7 @@ void showHistoryMenu() {
         int shown = currentshown;
         for (int i = currentshown; i < history.size(); i++) {
             if (shown > limit - 1) break;
-            std::cout << "[" << i + 1 << "]";
-            for (Password *j : bookmarks) {
-                if (j->id == history[i].id) {
-                    std::cout << "*";
-                    break;
-                }
-            }
-            std::cout << " " << history[i].password << "\n";
+            std::cout << history[i].password << "\n";
             shown++;
         }
 
@@ -185,22 +178,79 @@ void showHistoryMenu() {
 
 void showAddBookmarkMenu(int startLimit, int endLimit) {
     bool isShown = true;
+    int limit = 5;
+    int currentshown = 0;
     do {
-        std::cout << "Select the password to bookmark (1~10): ";
-        std::cout << "Enter 0 to cancel";
-        int choice;
-        std::cin >> choice;
+        showLineBreak();
+        std::string historyAscii[8] = {
+            "$$$$$$$\\\\                      $$\\                                         $$\\       ",
+            "$$  __$$\\                     $$ |                                        $$ |      ",
+            "$$ |  $$ | $$$$$$\\   $$$$$$\\  $$ |  $$\\ $$$$$$\\$$\\$$\\   $$$$$$\\   $$$$$$\\  $$ |  $$\\ ",
+            "$$$$$$$\\ |$$  __$$\\ $$  __$$\\ $$ | $$  |$$  _$$  _$$\\  \\____$$\\ $$  __$$\ $$ | $$  |",
+            "$$  __$$\\ $$ /  $$ |$$ /  $$ |$$$$$$  / $$ / $$ / $$ | $$$$$$$ |$$ |  \\__|$$$$$$  / ",
+            "$$ |  $$ |$$ |  $$ |$$ |  $$ |$$  _$$<  $$ | $$ | $$ |$$  __$$ |$$ |      $$  _$$<  ",
+            "$$$$$$$  |\\$$$$$$  | \\$$$$$$  |$$ | \\$$\\ $$ | $$ | $$ |\\$$$$$$$ |$$ |      $$ | \\$$\\ ",
+            "\\_______/  \\______/   \\______/ \\__|  \\__|\\__| \\__| \\__| \\_______|\\__|      \\__|  \\__|"
+        };
 
-        if (choice == 0) isShown = false;
-        if (choice > endLimit || choice < startLimit) {
-         std::cout << "try again" << startLimit << "   " << endLimit;
+        for (std::string line : historyAscii) {
+            std::cout << line << "\n";
+        }
+
+        std::cout << "\n[N]ext [P]revious [E]xit | Select the password to bookmark (1~10)";
+        showLineBreak();
+
+        int shown = currentshown;
+        for (int i = currentshown; i < history.size(); i++) {
+            if (shown > limit - 1) break;
+            std::cout << "[" << i + 1 << "]";
+            for (Password *j : bookmarks) {
+                if (j->id == history[i].id) {
+                    std::cout << "*";
+                    break;
+                }
+            }
+            std::cout << " " << history[i].password << "\n";
+            shown++;
+        }
+
+        std::cout << "\n\n───🡆 ";
+        char input;
+        std::cin >> input;
+
+        if (std::isdigit(input)) {
+            int choice = input - '0';
+
+            if (choice > history.size() || choice < 1) {
+                continue;
+            }
+
+            bookmarks.push_back(&history[choice-1]);
+            std::cout << "\nBookmarks\n";
+            for (Password *b : bookmarks) {
+                std::cout << b->password << "\n";
+            }
             continue;
         }
 
-        bookmarks.push_back(&history[choice-1]);
-        std::cout << "\nBookmarks\n";
-        for (Password *b : bookmarks) {
-            std::cout << b->password << "\n";
+        switch (input) {
+            case 'N':
+            case 'n':
+                limit += 5;
+                currentshown = shown;
+                break;
+            case 'P':
+            case 'p':
+                limit -= 5;
+                currentshown -= 5;
+                break;
+            case 'E':
+            case 'e':
+                isShown = false;
+                showHistoryMenu();
+                break;
+            default:
+                break;
         }
     } while (isShown);
 }

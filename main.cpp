@@ -4,13 +4,6 @@
 #include <limits>
 #include <vector>
 
-// TODO:
-// - [/] Implement ID system on checkPass(). I think I should base the ID on the history's vector length since some function rely on a linear ID.
-// - [ ] Add history logic code.
-// - [/] BUG: Right now, on the history pagination, you can go back and go forward too much. Add a limit.
-// - [/] change password to password
-// - [/] choose power or score or points
-
 // ----- INITIALIZATION CODE -----
 struct Password {
     int id {};
@@ -25,38 +18,28 @@ struct Password {
     std::string password {};
 };
 
-Password checkPass(std::string inputPassword);
-std::string parsePassPower(int power);
+Password checkPassword(std::string inputPassword);
+std::string parsePasswordPower(int power);
 void addToHistory(Password password);
 void showLineBreak();
 void showStartMenu();
-void showCheckPasswordMenu();
+void showPasswordMenu();
 void showPasswordScoreBreakdown(Password password);
 void showHistoryMenu();
 
 int HISTORY_CAPACITY = 100;
-int historySize = 10; // 0 by default
-Password history[100] = {
-    {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
-    {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
-    {3,  true,  false, true,  1,    0,   1,    2,   7,   "d0llar$"},
-    {4,  false, true,  true,  0,    2,   2,    2,   12,  "HelloWorld42"},
-    {5,  true,  true,  true,  4,    2,   1,    3,   11,  "C++Rocks!2#"},
-    {6,  false, true,  false, 0,    2,   0,    1,   9,   "OnlyUpper"},
-    {7,  true,  false, false, 1,    0,   0,    1,   7,   "$ymbols"},
-    {8,  false, false, true,  0,    0,   6,    1,   6,   "123456"},
-    {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
-    {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
-};
+int historySize = 0;
+Password history[100] = {};
 Password *ptrHistory = history;
 
 // ----- LOGIC CODE -----
-Password checkPass(std::string inputPassword) {
+Password checkPassword(std::string inputPassword) {
     Password password {};
     password.id = historySize;
     password.password = inputPassword;
     password.length = inputPassword.length();
 
+    // Check if the password contains symbols, capital letters, and numbers
     for (char c : inputPassword) {
         if (std::ispunct(c)) {
             password.symbolCount++;
@@ -81,6 +64,7 @@ Password checkPass(std::string inputPassword) {
         }
     }
 
+    // Gives 1 point for every 4 characters of the password.
     int length = password.length;
     while (length > 4) {
         password.power++;
@@ -90,7 +74,7 @@ Password checkPass(std::string inputPassword) {
     return password;
 }
 
-std::string parsePassPower(int power) {
+std::string parsePasswordPower(int power) {
     switch (power) {
         case 0:
         case 1:
@@ -147,7 +131,7 @@ void showStartMenu() {
             case 'C':
             case 'c':
                 isShown = false;
-                showCheckPasswordMenu();
+                showPasswordMenu();
                 break;
             case 'H':
             case 'h':
@@ -165,7 +149,7 @@ void showStartMenu() {
     } while (isShown);
 }
 
-void showCheckPasswordMenu() {
+void showPasswordMenu() {
     bool isShown = true;
     do {
         showLineBreak();
@@ -197,9 +181,8 @@ void showCheckPasswordMenu() {
             continue;
         }
 
-        Password password = checkPass(input);
-        history[historySize] = password;
-        historySize++;
+        Password password = checkPassword(input);
+        addToHistory(password);
 
         showPasswordScoreBreakdown(password);
         std::cin.get();
@@ -210,7 +193,7 @@ void showCheckPasswordMenu() {
 void showPasswordScoreBreakdown(Password password) {
     showLineBreak();
 
-    std::cout << "This is a " << parsePassPower(password.power) << " password.\n";
+    std::cout << "This is a " << parsePasswordPower(password.power) << " password.\n";
     std::cout << "\n\t\t\t\tSCORE BREAKDOWN\n";
 
     if (password.hasSymbol) {
@@ -243,6 +226,7 @@ void showPasswordScoreBreakdown(Password password) {
     std::cout << "\t\t\t\t\t" << password.power << " points\n";
 }
 
+// Displays the password on pages.
 void showHistoryMenu() {
     bool isShown = true;
     int MAX_PASSWORD_TO_SHOW = 5;

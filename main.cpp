@@ -236,8 +236,10 @@ void showPasswordScoreBreakdown(Password pass) {
 
 void showHistoryMenu() {
     bool isShown = true;
-    int limit = 5;
-    int currentshown = 0;
+    int MAX_PASSWORD_TO_SHOW = 5;
+    int startingIndex = 0;
+    int page = 1;
+
     do {
         showLineBreak();
         std::string historyAscii[11] = {
@@ -258,29 +260,28 @@ void showHistoryMenu() {
             std::cout << line << "\n";
         }
 
-        std::cout << "\n[N]ext [P]revious [E]xit";
+        std::cout << "\n[P]revious [N]ext [E]xit | " << page << " of " << historySize / MAX_PASSWORD_TO_SHOW;
         showLineBreak();
 
-        int shown = currentshown;
-        for (int i = currentshown; i < historySize; i++) {
-            if (shown > limit - 1) break;
+        for (int i = startingIndex; i < std::min((startingIndex + MAX_PASSWORD_TO_SHOW), historySize); i++) {
             std::cout << history[i].password << "\n";
-            shown++;
         }
 
         std::cout << "\n\n───🡆 ";
         char input {};
         std::cin >> input;
         switch (input) {
-            case 'N':
-            case 'n':
-                limit += 5;
-                currentshown = shown;
-                break;
             case 'P':
             case 'p':
-                limit -= 5;
-                currentshown -= 5;
+                if (startingIndex - MAX_PASSWORD_TO_SHOW < 0) break;
+                startingIndex -= MAX_PASSWORD_TO_SHOW;
+                page--;
+                break;
+            case 'N':
+            case 'n':
+                if (startingIndex + MAX_PASSWORD_TO_SHOW >= historySize) break;
+                startingIndex += MAX_PASSWORD_TO_SHOW;
+                page++;
                 break;
             case 'E':
             case 'e':

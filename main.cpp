@@ -4,14 +4,16 @@
 #include <limits>
 #include <vector>
 
-
 // TODO:
-// - [ ] on the history, passwords should not have a number. They should only appear when bookmarking
+// - [/] on the history, passwords should not have a number. They should only appear when bookmarking
 // - [ ] when bookmarking, bookmarked should have star(*) and selecting it will unbookmark it.
-// - [ ] Create the bookmark menu, showing the bookmarked passwords/
-// - [ ] Implement ID system on checkPass. I think I should base the ID on the history's vector length since some function rely on a linear ID.
+            // - THIS IS VERY COMPLICATEDDDDD. Let's focus on the others fist.
+// - [/] Create the bookmark menu, showing the bookmarked passwords/
+// - [/] Implement ID system on checkPass(). I think I should base the ID on the history's vector length since some function rely on a linear ID.
 // - [ ] Add history logic code.
 // - [ ] BUG: Right now, on the history pagination, you can go back and go forward too much. Add a limit.
+// - [ ] change pass to password
+// - [ ] choose power or score or points
 
 // ----- INITIALIZATION CODE -----
 struct Password {
@@ -36,24 +38,28 @@ void showPasswordScoreBreakdown(Password pass);
 void showHistoryMenu();
 void showAddBookmarkMenu(int startLimit, int endLimit);
 
-std::vector<Password> mockHistory = {
-    {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
-    {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
-    {3,  true,  false, true,  1,    0,   1,    2,   7,   "d0llar$"},
-    {4,  false, true,  true,  0,    2,   2,    2,   12,  "HelloWorld42"},
-    {5,  true,  true,  true,  4,    2,   1,    3,   11,  "C++Rocks!2#"},
-    {6,  false, true,  false, 0,    2,   0,    1,   9,   "OnlyUpper"},
-    {7,  true,  false, false, 1,    0,   0,    1,   7,   "$ymbols"},
-    {8,  false, false, true,  0,    0,   6,    1,   6,   "123456"},
-    {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
-    {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
+int HISTORY_CAPACITY = 100;
+int BOOKMARKS_CAPACITY = 100;
+int historySize = 0;
+int bookmarksSize = 0;
+Password history[100] = {
+    // {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
+    // {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
+    // {3,  true,  false, true,  1,    0,   1,    2,   7,   "d0llar$"},
+    // {4,  false, true,  true,  0,    2,   2,    2,   12,  "HelloWorld42"},
+    // {5,  true,  true,  true,  4,    2,   1,    3,   11,  "C++Rocks!2#"},
+    // {6,  false, true,  false, 0,    2,   0,    1,   9,   "OnlyUpper"},
+    // {7,  true,  false, false, 1,    0,   0,    1,   7,   "$ymbols"},
+    // {8,  false, false, true,  0,    0,   6,    1,   6,   "123456"},
+    // {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
+    // {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
 };
-std::vector<Password> history = mockHistory;
-std::vector<Password*> bookmarks = {};
+Password *bookmarks[100] = {};
 
 // ----- LOGIC CODE -----
 Password checkPass(std::string inputPassword) {
     Password pass {};
+    pass.id = historySize;
     pass.password = inputPassword;
     pass.length = inputPassword.length();
 
@@ -141,7 +147,7 @@ void showHistoryMenu() {
         showLineBreak();
 
         int shown = currentshown;
-        for (int i = currentshown; i < history.size(); i++) {
+        for (int i = currentshown; i < historySize; i++) {
             if (shown > limit - 1) break;
             std::cout << history[i].password << "\n";
             shown++;
@@ -201,7 +207,7 @@ void showAddBookmarkMenu(int startLimit, int endLimit) {
         showLineBreak();
 
         int shown = currentshown;
-        for (int i = currentshown; i < history.size(); i++) {
+        for (int i = currentshown; i < historySize; i++) {
             if (shown > limit - 1) break;
             std::cout << "[" << i + 1 << "]";
             for (Password *j : bookmarks) {
@@ -221,15 +227,12 @@ void showAddBookmarkMenu(int startLimit, int endLimit) {
         if (std::isdigit(input)) {
             int choice = input - '0';
 
-            if (choice > history.size() || choice < 1) {
+            if (choice > historySize || choice < 1) {
                 continue;
             }
 
-            bookmarks.push_back(&history[choice-1]);
-            std::cout << "\nBookmarks\n";
-            for (Password *b : bookmarks) {
-                std::cout << b->password << "\n";
-            }
+
+            bookmarks[bookmarksSize] = &history[choice - 1];
             continue;
         }
 
@@ -270,6 +273,8 @@ void showStartMenu() {
         for (std::string line : titleAscii) {
             std::cout << line << "\n";
         }
+        std::cout << "By LRRD & LGTR";
+        showLineBreak();
         std::cout << "[C]heck Password\n";
         std::cout << "[H]istory\n";
         std::cout << "[B]ookmarks\n";
@@ -357,11 +362,12 @@ void showCheckPasswordMenu() {
         for (std::string line : passwordAscii) {
             std::cout << line << "\n";
         }
+
         std::cout << "\n/exit to return to main menu";
         showLineBreak();
+
         std::string input;
         std::cout << "Password:: ";
-
         std::cin >> input;
 
         if (input == "/exit") {
@@ -370,6 +376,8 @@ void showCheckPasswordMenu() {
         }
 
         Password pass = checkPass(input);
+        history[historySize] = pass;
+        historySize++;
 
         showPasswordScoreBreakdown(pass);
         std::cin.get();

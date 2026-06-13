@@ -27,6 +27,7 @@ struct Password {
 
 Password checkPass(std::string inputPassword);
 std::string parsePassPower(int power);
+void addToHistory(Password password);
 void showLineBreak();
 void showStartMenu();
 void showCheckPasswordMenu();
@@ -47,6 +48,7 @@ Password history[100] = {
     {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
     {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
 };
+Password *ptrHistory = history;
 
 // ----- LOGIC CODE -----
 Password checkPass(std::string inputPassword) {
@@ -103,6 +105,11 @@ std::string parsePassPower(int power) {
         default:
             return "great";
     }
+}
+
+void addToHistory(Password password) {
+    *(ptrHistory + historySize) = password;
+    historySize++;
 }
 
 // ----- DISPLAY CODE ------
@@ -262,11 +269,11 @@ void showHistoryMenu() {
             std::cout << line << "\n";
         }
 
-        std::cout << "\n[P]revious [N]ext [E]xit | " << page << " of " << historySize / MAX_PASSWORD_TO_SHOW;
+        std::cout << "\n[P]revious [N]ext [E]xit | " << page << " of " << (historySize + MAX_PASSWORD_TO_SHOW - 1) / MAX_PASSWORD_TO_SHOW;
         showLineBreak();
 
         for (int i = startingIndex; i < std::min((startingIndex + MAX_PASSWORD_TO_SHOW), historySize); i++) {
-            std::cout << history[i].password << "\n";
+            std::cout << (ptrHistory + i)->password << "\n";
         }
 
         std::cout << "\n\n───🡆 ";

@@ -7,9 +7,9 @@
 // TODO:
 // - [/] Implement ID system on checkPass(). I think I should base the ID on the history's vector length since some function rely on a linear ID.
 // - [ ] Add history logic code.
-// - [ ] BUG: Right now, on the history pagination, you can go back and go forward too much. Add a limit.
-// - [ ] change pass to password
-// - [ ] choose power or score or points
+// - [/] BUG: Right now, on the history pagination, you can go back and go forward too much. Add a limit.
+// - [/] change password to password
+// - [/] choose power or score or points
 
 // ----- INITIALIZATION CODE -----
 struct Password {
@@ -30,62 +30,62 @@ std::string parsePassPower(int power);
 void showLineBreak();
 void showStartMenu();
 void showCheckPasswordMenu();
-void showPasswordScoreBreakdown(Password pass);
+void showPasswordScoreBreakdown(Password password);
 void showHistoryMenu();
 
 int HISTORY_CAPACITY = 100;
-int historySize = 0;
+int historySize = 10; // 0 by default
 Password history[100] = {
-    // {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
-    // {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
-    // {3,  true,  false, true,  1,    0,   1,    2,   7,   "d0llar$"},
-    // {4,  false, true,  true,  0,    2,   2,    2,   12,  "HelloWorld42"},
-    // {5,  true,  true,  true,  4,    2,   1,    3,   11,  "C++Rocks!2#"},
-    // {6,  false, true,  false, 0,    2,   0,    1,   9,   "OnlyUpper"},
-    // {7,  true,  false, false, 1,    0,   0,    1,   7,   "$ymbols"},
-    // {8,  false, false, true,  0,    0,   6,    1,   6,   "123456"},
-    // {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
-    // {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
+    {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
+    {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
+    {3,  true,  false, true,  1,    0,   1,    2,   7,   "d0llar$"},
+    {4,  false, true,  true,  0,    2,   2,    2,   12,  "HelloWorld42"},
+    {5,  true,  true,  true,  4,    2,   1,    3,   11,  "C++Rocks!2#"},
+    {6,  false, true,  false, 0,    2,   0,    1,   9,   "OnlyUpper"},
+    {7,  true,  false, false, 1,    0,   0,    1,   7,   "$ymbols"},
+    {8,  false, false, true,  0,    0,   6,    1,   6,   "123456"},
+    {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
+    {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
 };
 
 // ----- LOGIC CODE -----
 Password checkPass(std::string inputPassword) {
-    Password pass {};
-    pass.id = historySize;
-    pass.password = inputPassword;
-    pass.length = inputPassword.length();
+    Password password {};
+    password.id = historySize;
+    password.password = inputPassword;
+    password.length = inputPassword.length();
 
     for (char c : inputPassword) {
         if (std::ispunct(c)) {
-            pass.symbolCount++;
-            if (!pass.hasSymbol) {
-                pass.hasSymbol = true;
-                pass.power++;
+            password.symbolCount++;
+            if (!password.hasSymbol) {
+                password.hasSymbol = true;
+                password.power++;
             }
         }
         else if (std::isupper(c)) {
-            pass.upperCount++;
-            if (!pass.hasUpper) {
-                pass.hasUpper = true;
-                pass.power++;
+            password.upperCount++;
+            if (!password.hasUpper) {
+                password.hasUpper = true;
+                password.power++;
             }
         }
         else if (std::isdigit(c)) {
-            pass.numCount++;
-            if (!pass.hasNum) {
-                pass.hasNum = true;
-                pass.power++;
+            password.numCount++;
+            if (!password.hasNum) {
+                password.hasNum = true;
+                password.power++;
             }
         }
     }
 
-    int length = pass.length;
+    int length = password.length;
     while (length > 4) {
-        pass.power++;
+        password.power++;
         length -= 4;
     }
 
-    return pass;
+    return password;
 }
 
 std::string parsePassPower(int power) {
@@ -150,6 +150,7 @@ void showStartMenu() {
             case 'E':
             case 'e':
                 isShown = false;
+                return;
                 break;
             default:
                 break;
@@ -186,52 +187,53 @@ void showCheckPasswordMenu() {
         if (input == "/exit") {
             isShown = false;
             showStartMenu();
+            continue;
         }
 
-        Password pass = checkPass(input);
-        history[historySize] = pass;
+        Password password = checkPass(input);
+        history[historySize] = password;
         historySize++;
 
-        showPasswordScoreBreakdown(pass);
+        showPasswordScoreBreakdown(password);
         std::cin.get();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (isShown);
 }
 
-void showPasswordScoreBreakdown(Password pass) {
+void showPasswordScoreBreakdown(Password password) {
     showLineBreak();
 
-    std::cout << "This is a " << parsePassPower(pass.power) << " password.\n";
+    std::cout << "This is a " << parsePassPower(password.power) << " password.\n";
     std::cout << "\n\t\t\t\tSCORE BREAKDOWN\n";
 
-    if (pass.hasSymbol) {
-        std::cout << "\t\t" << pass.symbolCount << " symbol/s \t\t\t\t\t+1\n";
+    if (password.hasSymbol) {
+        std::cout << "\t\t" << password.symbolCount << " symbol/s \t\t\t\t\t+1\n";
     } else {
         std::cout << "\t\tNo symbols \t\t\t\t\t+0\n";
     }
 
-    if (pass.hasUpper) {
-        std::cout << "\t\t" << pass.upperCount << " uppercase letter/s \t\t+1\n";
+    if (password.hasUpper) {
+        std::cout << "\t\t" << password.upperCount << " uppercase letter/s \t\t+1\n";
     } else {
         std::cout << "\t\tNo uppercase letters \t\t+0\n";
     }
 
-    if (pass.hasNum) {
-        std::cout << "\t\t" << pass.numCount << " number/s \t\t\t\t\t+1\n";
+    if (password.hasNum) {
+        std::cout << "\t\t" << password.numCount << " number/s \t\t\t\t\t+1\n";
     } else {
         std::cout << "\t\tNo numbers, \t\t\t\t+0\n";
     }
 
-    int length = pass.length;
+    int length = password.length;
     int powerFromLength {};
     while (length > 4) {
         powerFromLength++;
         length -= 4;
     }
 
-    std::cout << "\t\t" << pass.length << " character/s long \t\t+" << powerFromLength << "\n";
+    std::cout << "\t\t" << password.length << " character/s long \t\t+" << powerFromLength << "\n";
     std::cout << "-----------------------------------------------\n";
-    std::cout << "\t\t\t\t\t" << pass.power << " points\n";
+    std::cout << "\t\t\t\t\t" << password.power << " points\n";
 }
 
 void showHistoryMenu() {

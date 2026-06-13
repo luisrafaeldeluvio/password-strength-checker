@@ -111,6 +111,129 @@ void showLineBreak() {
     std::cout << "\n═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════\n\n";
 }
 
+void showStartMenu() {
+    bool isShown = true;
+    do {
+        showLineBreak();
+        std::string titleAscii[7] = {
+            "  __                                           __                                           __                               ",
+            " /  |                                  |      /    /                        /    /         /    /              /             ",
+            "(___| ___  ___  ___       ___  ___  ___|     (___ (___  ___  ___  ___  ___ (___ (___      (    (___  ___  ___ (     ___  ___ ",
+            "|    |   )|___ |___ |   )|   )|   )|   )         )|    |   )|___)|   )|   )|    |   )     |   )|   )|___)|    |___)|___)|   )",
+            "|    |__/| __/  __/ |/\\/ |__/ |    |__/       __/ |__  |    |__  |  / |__/ |__  |  /      |__/ |  / |__  |__  | \\  |__  |    ",
+            "                                                                      __/                                                    "
+        };
+        for (std::string line : titleAscii) {
+            std::cout << line << "\n";
+        }
+        std::cout << "By LRRD & LGTR";
+        showLineBreak();
+        std::cout << "[C]heck Password\n";
+        std::cout << "[H]istory\n";
+        std::cout << "[E]xit\n";
+
+        char input {};
+        std::cout << "\n\n───🡆 ";
+        std::cin >> input;
+
+        switch (input) {
+            case 'C':
+            case 'c':
+                isShown = false;
+                showCheckPasswordMenu();
+                break;
+            case 'H':
+            case 'h':
+                isShown = false;
+                showHistoryMenu();
+                break;
+            case 'E':
+            case 'e':
+                isShown = false;
+                break;
+            default:
+                break;
+        }
+    } while (isShown);
+}
+
+void showCheckPasswordMenu() {
+    bool isShown = true;
+    do {
+        showLineBreak();
+        std::string passwordAscii[8] = {
+            "$$$$$$$\\                                                                       $$\\ ",
+            "$$  __$$\\                                                                      $$ |",
+            "$$ |  $$ |$$$$$$\\   $$$$$$$\\  $$$$$$$\\ $$\\  $$\\  $$\\  $$$$$$\\   $$$$$$\\   $$$$$$$ |",
+            "$$$$$$$  |\\____$$\\ $$  _____|$$  _____|$$ | $$ | $$ |$$  __$$\\ $$  __$$\\ $$  __$$ |",
+            "$$  ____/ $$$$$$$ |\\$$$$$$\\  \\$$$$$$\\  $$ | $$ | $$ |$$ /  $$ |$$ |  \\__|$$ /  $$ |",
+            "$$ |     $$  __$$ | \\____$$\\  \\____$$\\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$ |  $$ |",
+            "$$ |     \\$$$$$$$ |$$$$$$$  |$$$$$$$  |\\$$$$$\\$$$$  |\\$$$$$$  |$$ |      \\$$$$$$$ |",
+            "\\__|      \\_______|\\_______/ \\_______/  \\_____\\____/  \\______/ \\__|       \\_______|",
+        };
+
+        for (std::string line : passwordAscii) {
+            std::cout << line << "\n";
+        }
+
+        std::cout << "\n/exit to return to main menu";
+        showLineBreak();
+
+        std::string input;
+        std::cout << "Password:: ";
+        std::cin >> input;
+
+        if (input == "/exit") {
+            isShown = false;
+            showStartMenu();
+        }
+
+        Password pass = checkPass(input);
+        history[historySize] = pass;
+        historySize++;
+
+        showPasswordScoreBreakdown(pass);
+        std::cin.get();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    } while (isShown);
+}
+
+void showPasswordScoreBreakdown(Password pass) {
+    showLineBreak();
+
+    std::cout << "This is a " << parsePassPower(pass.power) << " password.\n";
+    std::cout << "\n\t\t\t\tSCORE BREAKDOWN\n";
+
+    if (pass.hasSymbol) {
+        std::cout << "\t\t" << pass.symbolCount << " symbol/s \t\t\t\t\t+1\n";
+    } else {
+        std::cout << "\t\tNo symbols \t\t\t\t\t+0\n";
+    }
+
+    if (pass.hasUpper) {
+        std::cout << "\t\t" << pass.upperCount << " uppercase letter/s \t\t+1\n";
+    } else {
+        std::cout << "\t\tNo uppercase letters \t\t+0\n";
+    }
+
+    if (pass.hasNum) {
+        std::cout << "\t\t" << pass.numCount << " number/s \t\t\t\t\t+1\n";
+    } else {
+        std::cout << "\t\tNo numbers, \t\t\t\t+0\n";
+    }
+
+    int length = pass.length;
+    int powerFromLength {};
+    while (length > 4) {
+        powerFromLength++;
+        length -= 4;
+    }
+
+    std::cout << "\t\t" << pass.length << " character/s long \t\t+" << powerFromLength << "\n";
+    std::cout << "-----------------------------------------------\n";
+    std::cout << "\t\t\t\t\t" << pass.power << " points\n";
+}
+
 void showHistoryMenu() {
     bool isShown = true;
     int limit = 5;
@@ -167,129 +290,6 @@ void showHistoryMenu() {
             default:
                 break;
         }
-    } while (isShown);
-}
-
-void showStartMenu() {
-    bool isShown = true;
-    do {
-        showLineBreak();
-        std::string titleAscii[7] = {
-            "  __                                           __                                           __                               ",
-            " /  |                                  |      /    /                        /    /         /    /              /             ",
-            "(___| ___  ___  ___       ___  ___  ___|     (___ (___  ___  ___  ___  ___ (___ (___      (    (___  ___  ___ (     ___  ___ ",
-            "|    |   )|___ |___ |   )|   )|   )|   )         )|    |   )|___)|   )|   )|    |   )     |   )|   )|___)|    |___)|___)|   )",
-            "|    |__/| __/  __/ |/\\/ |__/ |    |__/       __/ |__  |    |__  |  / |__/ |__  |  /      |__/ |  / |__  |__  | \\  |__  |    ",
-            "                                                                      __/                                                    "
-        };
-        for (std::string line : titleAscii) {
-            std::cout << line << "\n";
-        }
-        std::cout << "By LRRD & LGTR";
-        showLineBreak();
-        std::cout << "[C]heck Password\n";
-        std::cout << "[H]istory\n";
-        std::cout << "[E]xit\n";
-
-        char input {};
-        std::cout << "\n\n───🡆 ";
-        std::cin >> input;
-
-        switch (input) {
-            case 'C':
-            case 'c':
-                isShown = false;
-                showCheckPasswordMenu();
-                break;
-            case 'H':
-            case 'h':
-                isShown = false;
-                showHistoryMenu();
-                break;
-            case 'E':
-            case 'e':
-                isShown = false;
-                break;
-            default:
-                break;
-        }
-    } while (isShown);
-}
-
-void showPasswordScoreBreakdown(Password pass) {
-    showLineBreak();
-
-    std::cout << "This is a " << parsePassPower(pass.power) << " password.\n";
-    std::cout << "\n\t\t\t\tSCORE BREAKDOWN\n";
-
-    if (pass.hasSymbol) {
-        std::cout << "\t\t" << pass.symbolCount << " symbol/s \t\t\t\t\t+1\n";
-    } else {
-        std::cout << "\t\tNo symbols \t\t\t\t\t+0\n";
-    }
-
-    if (pass.hasUpper) {
-        std::cout << "\t\t" << pass.upperCount << " uppercase letter/s \t\t+1\n";
-    } else {
-        std::cout << "\t\tNo uppercase letters \t\t+0\n";
-    }
-
-    if (pass.hasNum) {
-        std::cout << "\t\t" << pass.numCount << " number/s \t\t\t\t\t+1\n";
-    } else {
-        std::cout << "\t\tNo numbers, \t\t\t\t+0\n";
-    }
-
-    int length = pass.length;
-    int powerFromLength {};
-    while (length > 4) {
-        powerFromLength++;
-        length -= 4;
-    }
-
-    std::cout << "\t\t" << pass.length << " character/s long \t\t+" << powerFromLength << "\n";
-    std::cout << "-----------------------------------------------\n";
-    std::cout << "\t\t\t\t\t" << pass.power << " points\n";
-}
-
-void showCheckPasswordMenu() {
-    bool isShown = true;
-    do {
-        showLineBreak();
-        std::string passwordAscii[8] = {
-            "$$$$$$$\\                                                                       $$\\ ",
-            "$$  __$$\\                                                                      $$ |",
-            "$$ |  $$ |$$$$$$\\   $$$$$$$\\  $$$$$$$\\ $$\\  $$\\  $$\\  $$$$$$\\   $$$$$$\\   $$$$$$$ |",
-            "$$$$$$$  |\\____$$\\ $$  _____|$$  _____|$$ | $$ | $$ |$$  __$$\\ $$  __$$\\ $$  __$$ |",
-            "$$  ____/ $$$$$$$ |\\$$$$$$\\  \\$$$$$$\\  $$ | $$ | $$ |$$ /  $$ |$$ |  \\__|$$ /  $$ |",
-            "$$ |     $$  __$$ | \\____$$\\  \\____$$\\ $$ | $$ | $$ |$$ |  $$ |$$ |      $$ |  $$ |",
-            "$$ |     \\$$$$$$$ |$$$$$$$  |$$$$$$$  |\\$$$$$\\$$$$  |\\$$$$$$  |$$ |      \\$$$$$$$ |",
-            "\\__|      \\_______|\\_______/ \\_______/  \\_____\\____/  \\______/ \\__|       \\_______|",
-        };
-
-        for (std::string line : passwordAscii) {
-            std::cout << line << "\n";
-        }
-
-        std::cout << "\n/exit to return to main menu";
-        showLineBreak();
-
-        std::string input;
-        std::cout << "Password:: ";
-        std::cin >> input;
-
-        if (input == "/exit") {
-            isShown = false;
-            showStartMenu();
-        }
-
-        Password pass = checkPass(input);
-        history[historySize] = pass;
-        historySize++;
-
-        showPasswordScoreBreakdown(pass);
-        std::cin.get();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     } while (isShown);
 }
 

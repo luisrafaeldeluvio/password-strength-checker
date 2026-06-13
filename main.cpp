@@ -5,10 +5,6 @@
 #include <vector>
 
 // TODO:
-// - [/] on the history, passwords should not have a number. They should only appear when bookmarking
-// - [ ] when bookmarking, bookmarked should have star(*) and selecting it will unbookmark it.
-            // - THIS IS VERY COMPLICATEDDDDD. Let's focus on the others fist.
-// - [/] Create the bookmark menu, showing the bookmarked passwords/
 // - [/] Implement ID system on checkPass(). I think I should base the ID on the history's vector length since some function rely on a linear ID.
 // - [ ] Add history logic code.
 // - [ ] BUG: Right now, on the history pagination, you can go back and go forward too much. Add a limit.
@@ -36,12 +32,9 @@ void showStartMenu();
 void showCheckPasswordMenu();
 void showPasswordScoreBreakdown(Password pass);
 void showHistoryMenu();
-void showAddBookmarkMenu(int startLimit, int endLimit);
 
 int HISTORY_CAPACITY = 100;
-int BOOKMARKS_CAPACITY = 100;
 int historySize = 0;
-int bookmarksSize = 0;
 Password history[100] = {
     // {1,  true,  true,  true,  2,    1,   4,    3,   12,  "P@ssw0rd!123"},
     // {2,  true,  true,  true,  1,    1,   2,    3,   9,   "Secure99#"},
@@ -54,7 +47,6 @@ Password history[100] = {
     // {9,  true,  true,  true,  2,    2,   1,    3,   11,  "Str0ng!P#ss"},
     // {10, true,  false, true,  1,    0,   1,    2,   8,   "an0ther$"}
 };
-Password *bookmarks[100] = {};
 
 // ----- LOGIC CODE -----
 Password checkPass(std::string inputPassword) {
@@ -143,7 +135,7 @@ void showHistoryMenu() {
             std::cout << line << "\n";
         }
 
-        std::cout << "\n[N]ext [P]revious [B]ookmark [E]xit";
+        std::cout << "\n[N]ext [P]revious [E]xit";
         showLineBreak();
 
         int shown = currentshown;
@@ -167,90 +159,10 @@ void showHistoryMenu() {
                 limit -= 5;
                 currentshown -= 5;
                 break;
-            case 'B':
-            case 'b':
-                showAddBookmarkMenu(currentshown, limit);
-                break;
             case 'E':
             case 'e':
                 isShown = false;
                 showStartMenu();
-                break;
-            default:
-                break;
-        }
-    } while (isShown);
-}
-
-void showAddBookmarkMenu(int startLimit, int endLimit) {
-    bool isShown = true;
-    int limit = 5;
-    int currentshown = 0;
-    do {
-        showLineBreak();
-        std::string historyAscii[8] = {
-            "$$$$$$$\\\\                      $$\\                                         $$\\       ",
-            "$$  __$$\\                     $$ |                                        $$ |      ",
-            "$$ |  $$ | $$$$$$\\   $$$$$$\\  $$ |  $$\\ $$$$$$\\$$\\$$\\   $$$$$$\\   $$$$$$\\  $$ |  $$\\ ",
-            "$$$$$$$\\ |$$  __$$\\ $$  __$$\\ $$ | $$  |$$  _$$  _$$\\  \\____$$\\ $$  __$$\ $$ | $$  |",
-            "$$  __$$\\ $$ /  $$ |$$ /  $$ |$$$$$$  / $$ / $$ / $$ | $$$$$$$ |$$ |  \\__|$$$$$$  / ",
-            "$$ |  $$ |$$ |  $$ |$$ |  $$ |$$  _$$<  $$ | $$ | $$ |$$  __$$ |$$ |      $$  _$$<  ",
-            "$$$$$$$  |\\$$$$$$  | \\$$$$$$  |$$ | \\$$\\ $$ | $$ | $$ |\\$$$$$$$ |$$ |      $$ | \\$$\\ ",
-            "\\_______/  \\______/   \\______/ \\__|  \\__|\\__| \\__| \\__| \\_______|\\__|      \\__|  \\__|"
-        };
-
-        for (std::string line : historyAscii) {
-            std::cout << line << "\n";
-        }
-
-        std::cout << "\n[N]ext [P]revious [E]xit | Select the password to bookmark (1~10)";
-        showLineBreak();
-
-        int shown = currentshown;
-        for (int i = currentshown; i < historySize; i++) {
-            if (shown > limit - 1) break;
-            std::cout << "[" << i + 1 << "]";
-            for (Password *j : bookmarks) {
-                if (j->id == history[i].id) {
-                    std::cout << "*";
-                    break;
-                }
-            }
-            std::cout << " " << history[i].password << "\n";
-            shown++;
-        }
-
-        std::cout << "\n\n───🡆 ";
-        char input;
-        std::cin >> input;
-
-        if (std::isdigit(input)) {
-            int choice = input - '0';
-
-            if (choice > historySize || choice < 1) {
-                continue;
-            }
-
-
-            bookmarks[bookmarksSize] = &history[choice - 1];
-            continue;
-        }
-
-        switch (input) {
-            case 'N':
-            case 'n':
-                limit += 5;
-                currentshown = shown;
-                break;
-            case 'P':
-            case 'p':
-                limit -= 5;
-                currentshown -= 5;
-                break;
-            case 'E':
-            case 'e':
-                isShown = false;
-                showHistoryMenu();
                 break;
             default:
                 break;
@@ -277,7 +189,6 @@ void showStartMenu() {
         showLineBreak();
         std::cout << "[C]heck Password\n";
         std::cout << "[H]istory\n";
-        std::cout << "[B]ookmarks\n";
         std::cout << "[E]xit\n";
 
         char input {};
@@ -294,9 +205,6 @@ void showStartMenu() {
             case 'h':
                 isShown = false;
                 showHistoryMenu();
-                break;
-            case 'B':
-            case 'b':
                 break;
             case 'E':
             case 'e':

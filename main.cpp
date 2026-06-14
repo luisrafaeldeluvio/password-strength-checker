@@ -21,6 +21,7 @@ struct Password {
 Password checkPassword(std::string inputPassword);
 std::string parsePasswordPower(int power);
 void addToHistory(Password password);
+void toggleBookmark(int historyIndex);
 void showLineBreak();
 void showStartMenu();
 void showPasswordMenu();
@@ -98,6 +99,31 @@ std::string parsePasswordPower(int power) {
 void addToHistory(Password password) {
     *(ptrHistory + historySize) = password;
     historySize++;
+}
+
+void toggleBookmark(int historyIndex) {
+    if (historyIndex >= historySize || historyIndex < 0) return;
+
+    bool isBookmarked = false;
+    int bookmarkedIndex {};
+    for (int i = 0; i < bookmarksSize; i++) {
+        if (history[historyIndex].id == bookmarks[i]->id) {
+            isBookmarked = true;
+            bookmarkedIndex = i;
+            break;
+        }
+    }
+
+    if (isBookmarked) {
+        for (int i = bookmarkedIndex; i < bookmarksSize - 1; i++) {
+            bookmarks[i] = bookmarks[i + 1];
+        }
+        bookmarksSize--;
+        return;
+    }
+
+    bookmarks[bookmarksSize] = &history[historyIndex];
+    bookmarksSize++;
 }
 
 // ----- DISPLAY CODE ------
@@ -286,6 +312,7 @@ void showHistoryMenu() {
                 break;
             case 'B':
             case 'b':
+                isShown = false;
                 showAddBookmarkMenu();
                 break;
             case 'E':
@@ -301,8 +328,10 @@ void showHistoryMenu() {
 
 void showAddBookmarkMenu() {
     bool isShown = true;
-    int limit = 5;
-    int currentshown = 0;
+    int MAX_PASSWORD_TO_SHOW = 5;
+    int startingIndex = 0;
+    int page = 1;
+
     do {
         showLineBreak();
         std::string historyAscii[8] = {
@@ -320,21 +349,19 @@ void showAddBookmarkMenu() {
             std::cout << line << "\n";
         }
 
-        std::cout << "\n[N]ext [P]revious [E]xit | Select the password to bookmark (1~10)";
+        std::cout << "\n[N]ext [P]revious [E]xit | " << page << " of " << (historySize + MAX_PASSWORD_TO_SHOW - 1) / MAX_PASSWORD_TO_SHOW << " | Select the password to bookmark (1~10)";
         showLineBreak();
 
-        int shown = currentshown;
-        for (int i = currentshown; i < historySize; i++) {
-            if (shown > limit - 1) break;
+        for (int i = startingIndex; i < std::min((startingIndex + MAX_PASSWORD_TO_SHOW), historySize); i++) {
             std::cout << "[" << i + 1 << "]";
-            for (Password *j : bookmarks) {
-                if (j->id == history[i].id) {
+
+            for (int j = 0; j < bookmarksSize; j++) {
+                if (bookmarks[j]->id == history[i].id) {
                     std::cout << "*";
                     break;
                 }
             }
             std::cout << " " << history[i].password << "\n";
-            shown++;
         }
 
         std::cout << "\n\n───🡆 ";
@@ -342,27 +369,22 @@ void showAddBookmarkMenu() {
         std::cin >> input;
 
         if (std::isdigit(input)) {
-            int choice = input - '0';
-
-            if (choice > historySize || choice < 1) {
-                continue;
-            }
-
-
-            bookmarks[bookmarksSize] = &history[choice - 1];
+            toggleBookmark((input - 1) - '0');
             continue;
         }
 
         switch (input) {
-            case 'N':
-            case 'n':
-                limit += 5;
-                currentshown = shown;
-                break;
             case 'P':
             case 'p':
-                limit -= 5;
-                currentshown -= 5;
+                if (startingIndex - MAX_PASSWORD_TO_SHOW < 0) break;
+                startingIndex -= MAX_PASSWORD_TO_SHOW;
+                page--;
+                break;
+            case 'N':
+            case 'n':
+                if (startingIndex + MAX_PASSWORD_TO_SHOW >= historySize) break;
+                startingIndex += MAX_PASSWORD_TO_SHOW;
+                page++;
                 break;
             case 'E':
             case 'e':

@@ -26,11 +26,15 @@ void showStartMenu();
 void showPasswordMenu();
 void showPasswordScoreBreakdown(Password password);
 void showHistoryMenu();
+void showAddBookmarkMenu();
 
 int HISTORY_CAPACITY = 100;
+int BOOKMARKS_CAPACITY = 100;
 int historySize = 0;
+int bookmarksSize = 0;
 Password history[100] = {};
 Password *ptrHistory = history;
+Password *bookmarks[100] = {};
 
 // ----- LOGIC CODE -----
 Password checkPassword(std::string inputPassword) {
@@ -121,6 +125,7 @@ void showStartMenu() {
         showLineBreak();
         std::cout << "[C]heck Password\n";
         std::cout << "[H]istory\n";
+        std::cout << "[B]ookmarks\n";
         std::cout << "[E]xit\n";
 
         char input {};
@@ -137,6 +142,9 @@ void showStartMenu() {
             case 'h':
                 isShown = false;
                 showHistoryMenu();
+                break;
+            case 'B':
+            case 'b':
                 break;
             case 'E':
             case 'e':
@@ -253,7 +261,7 @@ void showHistoryMenu() {
             std::cout << line << "\n";
         }
 
-        std::cout << "\n[P]revious [N]ext [E]xit | " << page << " of " << (historySize + MAX_PASSWORD_TO_SHOW - 1) / MAX_PASSWORD_TO_SHOW;
+        std::cout << "\n[P]revious [N]ext [B]ookmark [E]xit | " << page << " of " << (historySize + MAX_PASSWORD_TO_SHOW - 1) / MAX_PASSWORD_TO_SHOW;
         showLineBreak();
 
         for (int i = startingIndex; i < std::min((startingIndex + MAX_PASSWORD_TO_SHOW), historySize); i++) {
@@ -276,10 +284,90 @@ void showHistoryMenu() {
                 startingIndex += MAX_PASSWORD_TO_SHOW;
                 page++;
                 break;
+            case 'B':
+            case 'b':
+                showAddBookmarkMenu();
+                break;
             case 'E':
             case 'e':
                 isShown = false;
                 showStartMenu();
+                break;
+            default:
+                break;
+        }
+    } while (isShown);
+}
+
+void showAddBookmarkMenu() {
+    bool isShown = true;
+    int limit = 5;
+    int currentshown = 0;
+    do {
+        showLineBreak();
+        std::string historyAscii[8] = {
+            "$$$$$$$\\\\                      $$\\                                         $$\\       ",
+            "$$  __$$\\                     $$ |                                        $$ |      ",
+            "$$ |  $$ | $$$$$$\\   $$$$$$\\  $$ |  $$\\ $$$$$$\\$$\\$$\\   $$$$$$\\   $$$$$$\\  $$ |  $$\\ ",
+            "$$$$$$$\\ |$$  __$$\\ $$  __$$\\ $$ | $$  |$$  _$$  _$$\\  \\____$$\\ $$  __$$\ $$ | $$  |",
+            "$$  __$$\\ $$ /  $$ |$$ /  $$ |$$$$$$  / $$ / $$ / $$ | $$$$$$$ |$$ |  \\__|$$$$$$  / ",
+            "$$ |  $$ |$$ |  $$ |$$ |  $$ |$$  _$$<  $$ | $$ | $$ |$$  __$$ |$$ |      $$  _$$<  ",
+            "$$$$$$$  |\\$$$$$$  | \\$$$$$$  |$$ | \\$$\\ $$ | $$ | $$ |\\$$$$$$$ |$$ |      $$ | \\$$\\ ",
+            "\\_______/  \\______/   \\______/ \\__|  \\__|\\__| \\__| \\__| \\_______|\\__|      \\__|  \\__|"
+        };
+
+        for (std::string line : historyAscii) {
+            std::cout << line << "\n";
+        }
+
+        std::cout << "\n[N]ext [P]revious [E]xit | Select the password to bookmark (1~10)";
+        showLineBreak();
+
+        int shown = currentshown;
+        for (int i = currentshown; i < historySize; i++) {
+            if (shown > limit - 1) break;
+            std::cout << "[" << i + 1 << "]";
+            for (Password *j : bookmarks) {
+                if (j->id == history[i].id) {
+                    std::cout << "*";
+                    break;
+                }
+            }
+            std::cout << " " << history[i].password << "\n";
+            shown++;
+        }
+
+        std::cout << "\n\n───🡆 ";
+        char input;
+        std::cin >> input;
+
+        if (std::isdigit(input)) {
+            int choice = input - '0';
+
+            if (choice > historySize || choice < 1) {
+                continue;
+            }
+
+
+            bookmarks[bookmarksSize] = &history[choice - 1];
+            continue;
+        }
+
+        switch (input) {
+            case 'N':
+            case 'n':
+                limit += 5;
+                currentshown = shown;
+                break;
+            case 'P':
+            case 'p':
+                limit -= 5;
+                currentshown -= 5;
+                break;
+            case 'E':
+            case 'e':
+                isShown = false;
+                showHistoryMenu();
                 break;
             default:
                 break;

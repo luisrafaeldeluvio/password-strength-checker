@@ -2,7 +2,6 @@
 #include <cctype>
 #include <string>
 #include <limits>
-#include <vector>
 
 // ----- INITIALIZATION CODE -----
 struct Password {
@@ -29,13 +28,26 @@ void showPasswordScoreBreakdown(Password password);
 void showHistoryMenu();
 void showBookmarkMenu(Password *passwordArray, int arraySize, void (*exitFunction)());
 
-int HISTORY_CAPACITY = 100;
-int BOOKMARKS_CAPACITY = 100;
-int historySize = 0;
+const int HISTORY_CAPACITY = 100;
+const int BOOKMARKS_CAPACITY = 100;
+int historySize = 12; // Refers to the next index of the array that have no value.
 int bookmarksSize = 0;
-Password history[100] = {};
+Password history[HISTORY_CAPACITY] = {
+    {0, false, false, false, 0, 0, 0, 0, 0, "myPassword123"},
+    {1, false, false, false, 0, 0, 0, 0, 0, "mh#erfg:86"},
+    {2, false, false, false, 0, 0, 0, 0, 0, "@lquAwnJ93J.dj"},
+    {3, false, false, false, 0, 0, 0, 0, 0, "brightLight6767."},
+    {4, false, false, false, 0, 0, 0, 0, 0, "simplePasswordLang"},
+    {5, false, false, false, 0, 0, 0, 0, 0, "admin"},
+    {6, false, false, false, 0, 0, 0, 0, 0, "admin123"},
+    {7, false, false, false, 0, 0, 0, 0, 0, "MyAdmin"},
+    {8, false, false, false, 0, 0, 0, 0, 0, "mjfv"},
+    {9, false, false, false, 0, 0, 0, 0, 0, "87rfbh/.';gf"},
+    {10, false, false, false, 0, 0, 0, 0, 0, "thisismySUPER_LONG_PASSWORD6767!*."},
+    {11, false, false, false, 0, 0, 0, 0, 0, "lkjhgfd"},
+};
 Password *ptrHistory = history;
-Password *bookmarks[100] = {};
+Password *bookmarks[BOOKMARKS_CAPACITY] = {};
 
 // ----- LOGIC CODE -----
 
@@ -106,7 +118,8 @@ void addToHistory(Password password) {
 }
 
 // *array - Points to the array of Password objects to inspect.
-// arrayIndex - The specific index inside the array to evaluate.
+// arraySize - The size of *array.
+// arrayIndex - The specific index of the Password inside the array to evaluate.
 // Dynamically add and remove a reference from the bookmarks array.
 void toggleBookmark(Password *array,  int arraySize, int arrayIndex) {
     // prevent index from going under and over the array's size.
